@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+	xmlns:util="http://www.springframework.org/schema/util">
+
+	<int:channel id="receiveChannel" />
+
+	<!-- pop3://user:password@host:port/INBOX -->
+	<int-mail:inbound-channel-adapter id="pop3ShouldDeleteTrue"
+				channel="receiveChannel"
+	            store-uri="pop3://542485d792946b64f:fa4d5f5a77b7b9@mailtrap.io:9950/INBOX" 
+	            should-delete-messages="true"
+	            auto-startup="true"
+	            java-mail-properties="pop3Properties">
+			<!-- poll every 20 seconds -->
+			<int:poller fixed-rate="20000"/>
+	</int-mail:inbound-channel-adapter>
+
+	<util:properties id="pop3Properties">
+		<prop key="mail.pop3.disabletop">true</prop>
+		<prop key="mail.pop3.disablecapa">true</prop>
+<!--	<prop key="mail.debug">true</prop>
+		<prop key="mail.pop3.socketFactory.fallback">false</prop>
+		<prop key="mail.pop3.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+		<prop key="mail.pop3.socketFactory.port">995</prop> -->
+	</util:properties>
+
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host"><value>mailtrap.io</value></property>
+        <property name="port"><value>25</value></property>
+        <property name="protocol"><value>smtp</value></property>
+        <property name="username"><value>542485d792946b64f</value></property>
+        <property name="password"><value>fa4d5f5a77b7b9</value></property>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+<!--            <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtp.quitwait">false</prop>
+                <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+				<prop key="mail.smtp.socketFactory.fallback">false</prop> -->
+            </props>
+        </property>
+	</bean>
+
+</beans>
